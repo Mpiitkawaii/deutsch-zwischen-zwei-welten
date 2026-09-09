@@ -1162,8 +1162,8 @@
             }
 
             // Speaker Tag & Emotion
-            document.getElementById('speaker-name').innerText = scene.speaker;
-            document.getElementById('speaker-emotion-badge').innerText = scene.emotion ? `[${scene.emotion}]` : "";
+            document.getElementById('speaker-name').textContent = scene.speaker;
+            document.getElementById('speaker-emotion-badge').textContent = scene.emotion ? `[${scene.emotion}]` : "";
 
             // Onset Prompt Display
             const onsetBanner = document.getElementById('onset-banner');
@@ -1196,35 +1196,50 @@
                     }
                 }
             });
-        }
-
         function typeWriterText(text, onComplete) {
-            isTyping = true;
-            currentFullText = text;
-            const textEl = document.getElementById('dialogue-text');
-            textEl.innerText = "";
-            let index = 0;
+    isTyping = true;
+    currentFullText = text;
 
-            if (typingTimer) clearInterval(typingTimer);
+    const textEl = document.getElementById('dialogue-text');
 
-            typingTimer = setInterval(() => {
-                if (index < text.length) {
-                    textEl.innerText += text.charAt(index);
-                    if (index % 3 === 0) playSoundEffect('type');
-                    index++;
-                } else {
-                    clearInterval(typingTimer);
-                    isTyping = false;
-                    if (onComplete) onComplete();
-                }
-            }, gameState.textSpeed);
+    // Clear text
+    textEl.textContent = "";
+
+    let index = 0;
+
+    if (typingTimer) {
+        clearInterval(typingTimer);
+    }
+
+    typingTimer = setInterval(() => {
+        if (index < text.length) {
+
+            // textContent preserves spaces reliably
+            textEl.textContent += text.charAt(index);
+
+            if (index % 3 === 0) {
+                playSoundEffect('type');
+            }
+
+            index++;
+
+        } else {
+            clearInterval(typingTimer);
+            typingTimer = null;
+            isTyping = false;
+
+            if (onComplete) {
+                onComplete();
+            }
         }
+    }, gameState.textSpeed);
+}
 
         function handleDialogueBoxClick() {
             if (isTyping) {
                 // Instantly complete text typing
                 clearInterval(typingTimer);
-                document.getElementById('dialogue-text').innerText = currentFullText;
+                document.getElementById('dialogue-text').textContent = currentFullText;
                 isTyping = false;
                 document.getElementById('next-indicator').classList.remove('hidden');
                 
